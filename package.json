@@ -20,11 +20,59 @@
     "del": "^2.2.0",
     "gulp": "^3.9.0",
     "gulp-babel": "^6.1.1",
+    "koa": "^1.1.2",
     "mocha": "^2.3.4",
-    "run-sequence": "^1.1.5"
+    "run-sequence": "^1.1.5",
+    "supertest": "^1.1.0"
   },
   "repository": {
     "type": "git",
     "url": "git@github.com:LoveKino/cl-koa-midtools.git"
+  },
+  "eslintConfig": {
+    "globals": {
+      "describe": true,
+      "it": true
+    },
+    "parser": "babel-eslint",
+    "rules": {
+      "indent": [
+        2,
+        4
+      ],
+      "quotes": [
+        2,
+        "single"
+      ],
+      "linebreak-style": [
+        2,
+        "unix"
+      ],
+      "semi": [
+        2,
+        "always"
+      ],
+      "no-trailing-spaces": 2,
+      "space-before-function-paren": [
+        2,
+        "always"
+      ],
+      "eqeqeq": [
+        2,
+        "allow-null"
+      ]
+    },
+    "env": {
+      "browser": true,
+      "node": true
+    },
+    "extends": "eslint:recommended"
+  },
+  "dependencies": {
+    "cl-interflow": "0.0.4",
+    "colors": "^1.1.2",
+    "es6-promisify": "^3.0.0",
+    "koa-send": "^3.1.0",
+    "tracer": "^0.8.2"
   }
 }
