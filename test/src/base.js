@@ -12,6 +12,20 @@ from '../../index';
 import request from 'supertest';
 import koa from 'koa';
 
+import {
+    quicks
+}
+from 'cl-interflow';
+
+import http from 'http';
+import assert from 'assert';
+
+let listen = (server, port) => new Promise((r) => {
+    server.listen(port, () => {
+        r(server);
+    });
+});
+
 describe('base', () => {
     it('X-Response-Time', (done) => {
         const app = koa();
@@ -30,7 +44,7 @@ describe('base', () => {
         const app = koa();
         app.use(access());
 
-        app.use(function *() {
+        app.use(function*() {
             this.body = 'ok!';
         });
 
@@ -111,5 +125,34 @@ describe('base', () => {
             .get('/static/test.txt')
             .expect('hello!')
             .expect(200, done);
+    });
+
+    it('api', async () => {
+        const app = koa();
+        pushMid(app, [
+            api((ctx, apiName) => {
+                let map = {
+                    add: (a, b) => a + b
+                };
+                return map[apiName];
+            })
+        ]);
+
+        let server = http.createServer(app.callback());
+
+        await listen(server, 0);
+
+        let quickHttp = quicks.quickHttp();
+
+        // get
+        let getApis = quickHttp.getApi({
+            hostname: '127.0.0.1',
+            port: server.address().port
+        });
+        let addApi = getApis('add');
+
+        let ret = await addApi(2, 4);
+
+        assert.equal(ret, 6);
     });
 });
