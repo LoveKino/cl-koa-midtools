@@ -6,8 +6,9 @@ module.exports = (handlerMidGen, logger = defLogger) => function *(next) {
     } catch (err) {
         this.status = err.status || 500;
         this.body = err.message;
-        this.app.emit('error', err, this);
-        logger.error(err);
-        handlerMidGen && handlerMidGen(err).call(this, next);
+        logger.error(err, err.stack);
+        if(handlerMidGen) {
+            yield handlerMidGen(err).call(this, next);
+        }
     }
 };
