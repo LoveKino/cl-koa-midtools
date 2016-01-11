@@ -16,7 +16,6 @@ module.exports = (staticDir, getPath = def) => function* () {
         rest = getPath(this);
     }
     let filePath = path.join(staticDir, rest);
-    console.log(filePath);
     let stats = yield stat(filePath);
     if (stats.isFile()) {
         yield send(this, rest, {

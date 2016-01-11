@@ -63,4 +63,21 @@ describe('base', () => {
             .expect('hello1')
             .expect(200, done);
     });
+
+    it('route4', (done) => {
+        const app = koa();
+        pushMid(app, [
+            route({
+                method: 'GET',
+                url: 'abc'
+            }, function*() {
+                this.body = 'hello1';
+            })
+        ]);
+
+        request(app.listen())
+            .get('/abc')
+            .expect('hello1')
+            .expect(200, done);
+    });
 });

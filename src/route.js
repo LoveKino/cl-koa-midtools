@@ -4,8 +4,8 @@ import match from './util/match';
  */
 
 let route = (way, mid, errHandler) => {
-    return function*(next) {
-        if (match(way, this)) {
+    return function * (next) {
+        if (match(way, this, 'url')) {
             try {
                 yield mid.apply(this, [next]);
             } catch (err) {
