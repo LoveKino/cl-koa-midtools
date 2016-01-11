@@ -53,7 +53,24 @@ describe('base', () => {
     it('route3', (done) => {
         const app = koa();
         pushMid(app, [
-            route(['/abc', '/bcd'], function*() {
+            route({
+                method: 'GET',
+                url: 'abc'
+            }, function*() {
+                this.body = 'hello1';
+            })
+        ]);
+
+        request(app.listen())
+            .get('/abc')
+            .expect('hello1')
+            .expect(200, done);
+    });
+
+    it('route: or', (done) => {
+        const app = koa();
+        pushMid(app, [
+            route(route.or('/abc', '/bcd'), function*() {
                 this.body = 'hello1';
             })
         ]);
@@ -64,13 +81,12 @@ describe('base', () => {
             .expect(200, done);
     });
 
-    it('route4', (done) => {
+    it('route: and', (done) => {
         const app = koa();
         pushMid(app, [
-            route({
-                method: 'GET',
-                url: 'abc'
-            }, function*() {
+            route(route.and('/abc', {
+                method: 'GET'
+            }), function*() {
                 this.body = 'hello1';
             })
         ]);
