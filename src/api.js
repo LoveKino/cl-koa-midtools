@@ -20,7 +20,7 @@ let { mider } = plainhttp({
     flusher: koaFlusher,
     midForm: (dealer, flusher) => function* () {
         this.res.ctx = this;
-        dealer({
+        return dealer({
             req: this.req,
             body: this.request.body
         }, flusher(this.res));
@@ -35,7 +35,8 @@ let finder = (methods, ctx) => (ins=[]) => {
 };
 
 module.exports = function (methods) {
-    return function * () {
-        return yield mider(finder(methods, this));
+    return function * (next) {
+        let mid = mider(finder(methods, this));
+        return yield mid.call(this, next);
     };
 };

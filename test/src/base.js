@@ -26,6 +26,8 @@ let listen = (server, port) => new Promise((r) => {
     });
 });
 
+let sleep = (time) => new Promise((r) => setTimeout(r, time));
+
 describe('base', () => {
     it('X-Response-Time', (done) => {
         const app = koa();
@@ -159,5 +161,40 @@ describe('base', () => {
             ins: [2, 4]
         });
         assert.equal(ret.result, 6);
+    });
+
+    it('api:promise', async () => {
+        const app = koa();
+        pushMid(app, [
+            api(function (ctx, apiName) {
+                let map = {
+                    add: async (a, b) => {
+                        await sleep(30);
+                        return {
+                            result: a + b
+                        };
+                    }
+                };
+                return map[apiName];
+            })
+        ]);
+
+        let server = http.createServer(app.callback());
+
+        await listen(server, 0);
+
+        let { caller } = plainhttp({
+            processor: plainhttp.processors.rc
+        });
+
+        let ret = await caller({
+            options: {
+                hostname: '127.0.0.1',
+                port: server.address().port
+            },
+            apiName: 'add',
+            ins: [20, 40]
+        });
+        assert.equal(ret.result, 60);
     });
 });
