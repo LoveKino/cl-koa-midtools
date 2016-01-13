@@ -35,6 +35,8 @@ let finder = (methods, ctx) => (ins) => {
     return method(...args);
 };
 
-module.exports = (methods) => {
-    return mider(finder(methods, this));
+module.exports = function (methods) {
+    return function * () {
+        return yield mider(finder(methods, this));
+    };
 };

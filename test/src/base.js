@@ -130,7 +130,7 @@ describe('base', () => {
     it('api', async () => {
         const app = koa();
         pushMid(app, [
-            api((ctx, apiName) => {
+            api(function (ctx, apiName) {
                 let map = {
                     add: (a, b) => a + b
                 };
