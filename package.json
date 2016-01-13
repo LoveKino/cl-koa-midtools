@@ -1,6 +1,6 @@
 {
   "name": "cl-koa-midtools",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Collect some useful koa tools.",
   "main": "index.js",
   "scripts": {
