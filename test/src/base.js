@@ -132,7 +132,11 @@ describe('base', () => {
         pushMid(app, [
             api(function (ctx, apiName) {
                 let map = {
-                    add: (a, b) => a + b
+                    add: (a, b) => {
+                        return {
+                            result: a + b
+                        };
+                    }
                 };
                 return map[apiName];
             })
@@ -154,6 +158,6 @@ describe('base', () => {
             apiName: 'add',
             ins: [2, 4]
         });
-        assert.equal(ret, 6);
+        assert.equal(ret.result, 6);
     });
 });

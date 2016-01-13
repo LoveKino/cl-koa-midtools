@@ -6,7 +6,6 @@ from 'cl-interflow';
 // use this one : this.body = res.body
 let koaFlusher = (res) => (rawOut) => {
     let outBody = rawOut.body;
-    outBody = outBody ? JSON.stringify(outBody) : '';
     res.ctx.body = outBody;
     let resHeaders = rawOut.headers;
     if(resHeaders) {
@@ -28,11 +27,11 @@ let { mider } = plainhttp({
     }
 });
 
-let finder = (methods, ctx) => (ins) => {
+let finder = (methods, ctx) => (ins=[]) => {
     let apiName = ins[0];
     let args = ins[1];
     let method = methods(ctx, apiName);
-    return method(...args);
+    return method && method(...args);
 };
 
 module.exports = function (methods) {
