@@ -13,7 +13,7 @@ import request from 'supertest';
 import koa from 'koa';
 
 import {
-    quicks
+    plainhttp
 }
 from 'cl-interflow';
 
@@ -142,17 +142,18 @@ describe('base', () => {
 
         await listen(server, 0);
 
-        let quickHttp = quicks.quickHttp();
-
-        // get
-        let getApis = quickHttp.getApi({
-            hostname: '127.0.0.1',
-            port: server.address().port
+        let { caller } = plainhttp({
+            processor: plainhttp.processors.rc
         });
-        let addApi = getApis('add');
 
-        let ret = await addApi(2, 4);
-
+        let ret = await caller({
+            options: {
+                hostname: '127.0.0.1',
+                port: server.address().port
+            },
+            apiName: 'add',
+            ins: [2, 4]
+        });
         assert.equal(ret, 6);
     });
 });

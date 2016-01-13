@@ -1,9 +1,8 @@
 import {
-    quicks
+    plainhttp
 }
 from 'cl-interflow';
 
-// TODO - lib
 // use this one : this.body = res.body
 let koaFlusher = (res) => (rawOut) => {
     let outBody = rawOut.body;
@@ -17,15 +16,25 @@ let koaFlusher = (res) => (rawOut) => {
     }
 };
 
-module.exports = (methods) => {
-    let quickHttp = quicks.quickHttp({
-        flusher: koaFlusher
-    });
-
-    return function *() {
-        // create sample response
-        let mid = quickHttp.mider((apiName) => methods(this, apiName));
+let { mider } = plainhttp({
+    processor: plainhttp.processors.rc,
+    flusher: koaFlusher,
+    midForm: (dealer, flusher) => function* () {
         this.res.ctx = this;
-        yield mid(this.req, this.res, this.request.body);
-    };
+        dealer({
+            req: this.req,
+            body: this.request.body
+        }, flusher(this.res));
+    }
+});
+
+let finder = (methods, ctx) => (ins) => {
+    let apiName = ins[0];
+    let args = ins[1];
+    let method = methods(ctx, apiName);
+    return method(...args);
+};
+
+module.exports = (methods) => {
+    return mider(finder(methods, this));
 };

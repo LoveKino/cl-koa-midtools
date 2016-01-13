@@ -1,6 +1,6 @@
 {
   "name": "cl-koa-midtools",
-  "version": "0.0.1",
+  "version": "0.1.1",
   "description": "Collect some useful koa tools.",
   "main": "index.js",
   "scripts": {
@@ -69,7 +69,7 @@
     "extends": "eslint:recommended"
   },
   "dependencies": {
-    "cl-interflow": "0.0.4",
+    "cl-interflow": "^0.1.6",
     "colors": "^1.1.2",
     "es6-promisify": "^3.0.0",
     "koa-send": "^3.1.0",
