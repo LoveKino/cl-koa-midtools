@@ -37,9 +37,9 @@ describe('base', () => {
         });
 
         request(app.listen())
-            .get('/abc')
-            .expect('X-Response-Time', /[0-9]+ms/)
-            .expect('hello', done);
+        .get('/abc')
+        .expect('X-Response-Time', /[0-9]+ms/)
+        .expect('hello', done);
     });
 
     it('access', (done) => {
@@ -51,8 +51,8 @@ describe('base', () => {
         });
 
         request(app.listen())
-            .get('/abc')
-            .expect(200, done);
+        .get('/abc')
+        .expect(200, done);
     });
 
     it('error', (done) => {
@@ -63,9 +63,9 @@ describe('base', () => {
         });
 
         request(app.listen())
-            .get('/abc')
-            .expect('error happened!!')
-            .expect(500, done);
+        .get('/abc')
+        .expect('error happened!!')
+        .expect(500, done);
     });
 
     it('error2', (done) => {
@@ -78,9 +78,9 @@ describe('base', () => {
         });
 
         request(app.listen())
-            .get('/abc')
-            .expect('system error')
-            .expect(500, done);
+        .get('/abc')
+        .expect('system error')
+        .expect(500, done);
     });
 
     it('parseBody', (done) => {
@@ -91,12 +91,12 @@ describe('base', () => {
         });
 
         request(app.listen())
-            .post('/')
-            .send({
-                name: 'tobi'
-            })
-            .expect('{"name":"tobi"}')
-            .expect(200, done);
+        .post('/')
+        .send({
+            name: 'tobi'
+        })
+        .expect('{"name":"tobi"}')
+        .expect(200, done);
     });
 
     it('pushMid', (done) => {
@@ -109,12 +109,12 @@ describe('base', () => {
         ]);
 
         request(app.listen())
-            .post('/')
-            .send({
-                name: 'tobi'
-            })
-            .expect('{"name":"tobi"}')
-            .expect(200, done);
+        .post('/')
+        .send({
+            name: 'tobi'
+        })
+        .expect('{"name":"tobi"}')
+        .expect(200, done);
     });
 
     it('static', (done) => {
@@ -124,12 +124,12 @@ describe('base', () => {
         ]);
 
         request(app.listen())
-            .get('/static/test.txt')
-            .expect('hello!')
-            .expect(200, done);
+        .get('/static/test.txt')
+        .expect('hello!')
+        .expect(200, done);
     });
 
-    it('api', async () => {
+    it('api', async() => {
         const app = koa();
         pushMid(app, [
             api(function (ctx, apiName) {
@@ -148,8 +148,12 @@ describe('base', () => {
 
         await listen(server, 0);
 
-        let { caller } = plainhttp({
-            processor: plainhttp.processors.rc
+        let processor = plainhttp.processors.ep.pack(plainhttp.processors.rc);
+
+        let {
+            caller
+        } = plainhttp({
+            processor
         });
 
         let ret = await caller({
@@ -163,12 +167,12 @@ describe('base', () => {
         assert.equal(ret.result, 6);
     });
 
-    it('api:promise', async () => {
+    it('api:promise', async() => {
         const app = koa();
         pushMid(app, [
             api(function (ctx, apiName) {
                 let map = {
-                    add: async (a, b) => {
+                    add: async(a, b) => {
                         await sleep(30);
                         return {
                             result: a + b
@@ -183,8 +187,12 @@ describe('base', () => {
 
         await listen(server, 0);
 
-        let { caller } = plainhttp({
-            processor: plainhttp.processors.rc
+        let processor = plainhttp.processors.ep.pack(plainhttp.processors.rc);
+
+        let {
+            caller
+        } = plainhttp({
+            processor
         });
 
         let ret = await caller({
@@ -197,4 +205,47 @@ describe('base', () => {
         });
         assert.equal(ret.result, 60);
     });
+
+    it('api:exception', async() => {
+        const app = koa();
+        pushMid(app, [
+            api(function (ctx, apiName) {
+                let map = {
+                    add: async() => {
+                        await sleep(30);
+                        return ctx.apiError('mytype', 'my msg', {
+                            a: 1
+                        });
+                    }
+                };
+                return map[apiName];
+            })
+        ]);
+
+        let server = http.createServer(app.callback());
+
+        await listen(server, 0);
+
+        let processor = plainhttp.processors.ep.pack(plainhttp.processors.rc);
+
+        let {
+            caller
+        } = plainhttp({
+            processor
+        });
+        try {
+
+            await caller({
+                options: {
+                    hostname: '127.0.0.1',
+                    port: server.address().port
+                },
+                apiName: 'add',
+                ins: [20, 40]
+            });
+        } catch (err) {
+            assert.equal(err.type, 'mytype');
+        }
+    });
+
 });

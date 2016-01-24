@@ -3,6 +3,8 @@ import {
 }
 from 'cl-interflow';
 
+let processor = plainhttp.processors.ep.pack(plainhttp.processors.rc);
+
 // use this one : this.body = res.body
 let koaFlusher = (res) => (rawOut) => {
     let outBody = rawOut.body;
@@ -16,7 +18,7 @@ let koaFlusher = (res) => (rawOut) => {
 };
 
 let { mider } = plainhttp({
-    processor: plainhttp.processors.rc,
+    processor,
     flusher: koaFlusher,
     midForm: (dealer, flusher) => function* () {
         this.res.ctx = this;
@@ -31,7 +33,8 @@ let finder = (methods, ctx) => (ins=[]) => {
     let apiName = ins[0];
     let args = ins[1];
     let method = methods(ctx, apiName);
-    return method && method(...args);
+    ctx.apiError = plainhttp.processors.exception;
+    return method && method.apply(undefined, args);
 };
 
 module.exports = function (methods) {
