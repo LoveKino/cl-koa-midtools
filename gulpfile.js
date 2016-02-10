@@ -6,7 +6,7 @@ var Spawner = require('cl-spawner');
 
 var spawner = Spawner();
 // use this spawn instead of origin spawn
-var spawn = function(cmd, params) {
+var spawn = function (cmd, params) {
     return spawner.spawn(cmd, params, {
         stdio: 'inherit',
         cwd: __dirname
@@ -19,38 +19,39 @@ gulp.task('default', ['start']);
 gulp.watch([
     'src/**/*.js',
     'test/src/**/*.js',
+    'test/fixtures/**/*.js',
     'index.js'
 ], ['restart']);
 
-gulp.task('start', function(cb) {
+gulp.task('start', function (cb) {
     runSequence('stop', 'init', 'clean', 'build', 'test', cb);
 });
 
-gulp.task('restart', function(cb) {
+gulp.task('restart', function (cb) {
     runSequence('stop', 'clean', 'build', 'test', cb);
 });
 
-gulp.task('init', function() {
+gulp.task('init', function () {
     return spawn('npm', ['i']);
 });
 
-gulp.task('stop', function() {
+gulp.task('stop', function () {
     return spawner.killAll();
 });
 
-gulp.task('test', function() {
+gulp.task('test', function () {
     return spawn('npm', ['test']);
 });
 
-gulp.task('test-cover', function() {
+gulp.task('test-cover', function () {
     return spawn('npm', ['run', 'cover']);
 });
 
-gulp.task('clean', function() {
+gulp.task('clean', function () {
     return del([
         'lib',
         'test/lib'
-    ])
+    ]);
 });
 
 /**
@@ -58,7 +59,7 @@ gulp.task('clean', function() {
  */
 gulp.task('build', ['build-src', 'build-test']);
 
-gulp.task('build-src', function() {
+gulp.task('build-src', function () {
     return gulp.src('src/**/*.js')
         .pipe(babel({
             presets: ['es2015', 'stage-0']
@@ -66,7 +67,7 @@ gulp.task('build-src', function() {
         .pipe(gulp.dest('lib'));
 });
 
-gulp.task('build-test', function() {
+gulp.task('build-test', function () {
     return gulp.src('test/src/**/*.js')
         .pipe(babel({
             presets: ['es2015', 'stage-0']
